@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{../../static/css/Login.css}" />-->
+    <!--<script type="text/javascript" src="../../static/js/jquery-1.11.3.min.js"></script>-->
+    <style>
+        #s1{
+            float: left;
+            margin: 50px 0px 0px 100px;
+        }
+        #s2{
+            float: left;
+            margin: 50px 0px 0px 50px;
+        }
+    </style>
+    <script type="text/javascript">
+        function f1(){
+            //5-20个字母
+            var regx = /^[aA-zZ0-9._]{5,20}$/;
+            var username = document.getElementById("idname").value;
+            if(regx.test(username)){
+                document.getElementById("d1").style.color = "green";
+                document.getElementById("d1").innerHTML="√";
+                return true;
+            }else{
+                document.getElementById("d1").style.color = "red";
+                document.getElementById("d1").innerHTML="×";
+                return false;
+            }
+        }
+        function f2(){
+            //5-20个字母
+            var regx = /^[aA-zZ0-9_.]{5,20}$/;
+            var password = document.getElementById("password").value;
+            if(regx.test(password)){
+                document.getElementById("d2").style.color = "green";
+                document.getElementById("d2").innerHTML="√";
+                return true;
+            }else{
+                document.getElementById("d2").style.color = "red";
+                document.getElementById("d2").innerHTML="×";
+                return false;
+            }
+        }
+
+
+        function subForm(){
+            if(f1()&&f2()){
+                return true;
+            }
+            return false;
+        }
+    </script>
+</head>
+<body>
+<div>
+    <form action="/login" method="Post" onsubmit="return subForm()">
+        <table>
+            <tr>
+                <td><span>用户名：</span></td>
+                <td><input id="idname" type="text" name="idname" placeholder="5-20个字母" onblur="f1()"><span id="d1"></span></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <span>密码：</span>
+                </td>
+                <td><input id="password" type="password" name="password" placeholder="5-20个字母" onblur="f2()"><span id="d2"></span></td>
+            </tr>
+        </table>
+        <input id="s1" type="submit" value="登录">
+    </form>
+</div>
+</body>
+</html>
