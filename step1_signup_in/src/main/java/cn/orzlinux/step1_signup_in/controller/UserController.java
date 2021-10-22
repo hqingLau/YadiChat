@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,10 @@ public class UserController {
         return "index";
     }
 
+    @RequestMapping("/home")
+    public String home() {
+        return "index";
+    }
 
     @PostMapping("/login")
     public String login(Model model, HttpServletRequest request, HttpServletResponse response) {
@@ -37,13 +42,13 @@ public class UserController {
         String password = request.getParameter("password");
         User user = userService.login(new User(idname,null,password));
         if (user==null) {
-            return "sign-in";
+            return "redirect:/signin";
         }
         // 随便造一个session，放入
         String sess = MD5.getMd5(idname+"=^8&"+MD5.getMd5(password));
         request.getSession().setAttribute("userid", sess);
         model.addAttribute("userid",sess);
-        return "index";
+        return "redirect:/home";
     }
 
     // 注册
@@ -57,14 +62,19 @@ public class UserController {
         String idname = request.getParameter("idname");
         String password = request.getParameter("password");
         String nickname = request.getParameter("nickname");
-        boolean ret = userService.regist(new User(idname,nickname,password));
-        if (!ret) {
-            return "sign-up";
+        try {
+            boolean ret = userService.regist(new User(idname,nickname,password));
+            if (!ret) {
+                return "redirect:/signup";
+            }
+            // 随便造一个session，放入
+            String sess = MD5.getMd5(idname+"=^8&"+MD5.getMd5(password));
+            request.getSession().setAttribute("userid", sess);
+            return "redirect:/";
+        } catch (Exception e) {
+            return "redirect:/signup";
         }
-        // 随便造一个session，放入
-        String sess = MD5.getMd5(idname+"=^8&"+MD5.getMd5(password));
-        request.getSession().setAttribute("userid", sess);
-        return "index";
+
     }
 
     @RequestMapping("/somepage")

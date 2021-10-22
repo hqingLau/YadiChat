@@ -3,18 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>登录页面</title>
-    <!-- <link rel="stylesheet" type="text/css" th:href="@{../../static/css/Login.css}" />-->
-    <!--<script type="text/javascript" src="../../static/js/jquery-1.11.3.min.js"></script>-->
-    <style>
-        #s1{
-            float: left;
-            margin: 50px 0px 0px 100px;
-        }
-        #s2{
-            float: left;
-            margin: 50px 0px 0px 50px;
-        }
-    </style>
+
+    <link rel="stylesheet" type="text/css" href="login.css"/>
+    <script type="text/javascript" src="login.js"></script>
     <script type="text/javascript">
         function f1(){
             //5-20个字母
@@ -53,25 +44,134 @@
             return false;
         }
     </script>
-</head>
-<body>
-<div>
-    <form action="/login" method="Post" onsubmit="return subForm()">
-        <table>
-            <tr>
-                <td><span>用户名：</span></td>
-                <td><input id="idname" type="text" name="idname" placeholder="5-20个字母" onblur="f1()"><span id="d1"></span></td>
-            </tr>
+    <style type="text/css">
+        body {
+            background-color: grey;
+            background-size: 100%;
+            background-repeat: no-repeat;
+        }
 
-            <tr>
-                <td>
-                    <span>密码：</span>
-                </td>
-                <td><input id="password" type="password" name="password" placeholder="5-20个字母" onblur="f2()"><span id="d2"></span></td>
-            </tr>
-        </table>
-        <input id="s1" type="submit" value="登录">
+        #login_frame {
+            width: 400px;
+            height: 260px;
+            padding: 13px;
+
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -200px;
+            margin-top: -200px;
+
+            background-color: rgba(240, 255, 255, 0.5);
+
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        form p > * {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        #image_logo {
+            margin-top: 22px;
+        }
+
+        .label_input {
+            margin-right: -4px;
+            font-size: 14px;
+            font-family: 宋体;
+
+            width: 65px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+
+            color: white;
+            background-color: #3CD8FF;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .text_field {
+            width: 278px;
+            height: 28px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border: 0;
+        }
+
+        #btn_login {
+            font-size: 14px;
+            font-family: 宋体;
+
+            width: 120px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+
+            color: white;
+            background-color: #3BD9FF;
+            border-radius: 6px;
+            border: 0;
+
+            float: left;
+        }
+
+        #regist_a {
+            font-size: 12px;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            float: right;
+            top: 5px;
+
+        }
+        .btn_login {
+            font-size: 14px;
+            font-family: 宋体;
+
+            width: 120px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+
+            color: white;
+            background-color: #3BD9FF;
+            border-radius: 6px;
+            border: 0;
+
+            float: left;
+        }
+        #regist_a:hover {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        #login_control {
+            padding: 0 28px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="login_frame">
+
+    <h2>登录</h2>
+    <form action="/login" method="Post" onsubmit="return subForm()">
+        <p><label class="label_input">idName</label>
+            <input id="idname" type="text" name="idname" placeholder="5-20个字母" onblur="f1()" class="text_field"/><span id="d1"></span></p>
+        <p><label class="label_input">密码</label>
+            <input id="password" type="password" name="password" placeholder="5-20个字母" onblur="f2()" class="text_field"/><span id="d2"></span>
+        </p>
+
+        <div id="login_control">
+            <input type="submit" class="btn_login"  id="s1" value="登录"/>
+            <a id="regist_a" href="/signup">注册</a>
+        </div>
     </form>
 </div>
+
 </body>
+
 </html>
