@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+<html xmlns:resize="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>全局聊天室</title>
+    <!-- 引入 Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+</head>
+<body>
+<div class="page-header text-center text-primary">
+    <h1>全局聊天室</h1>
+</div>
+
+<br /><br />
+<!--<div id="message"></div>-->
+<ul class="list-group" id="message">
+    <li class="list-group-item" >欢迎入群</li>
+</ul>
+<br /><br />
+
+
+<div>
+    <button class="btn btn-primary" style="float: right;margin-right: 10px" type="button" onclick="send()">发送</button>
+    <div style="overflow: hidden; padding-right: 10px">
+    <textarea style="margin-left:10px;width: 100%; resize: none"
+           id="text"
+           name="send"
+           placeholder="输入发送消息"
+           rows="1"
+           autofocus="autofocus"
+           maxlength="1000"
+           minlength="1"
+           class="form-control"></textarea>
+    </div>
+    <div class="clear"></div>
+</div>
+
+<script type="text/javascript">
+    var webSocket;
+
+    if (window.WebSocket) {
+        webSocket = new WebSocket("ws://localhost:10240/ws");
+    } else {
+        alert("抱歉，您的浏览器不支持WebSocket协议!");
+    }
+
+    //连通之后的回调事件
+    webSocket.onopen = function() {
+        console.log("已经连通了websocket");
+        enter();
+    };
+    //连接发生错误的回调方法
+    webSocket.onerror = function(event){
+        console.log("出错了");
+//              setMessageInnerHTML("连接失败");
+    };
+
+    //连接关闭的回调方法
+    webSocket.onclose = function(){
+        console.log("连接已关闭...");
+
+    }
+
+    //接收到消息的回调方法
+    webSocket.onmessage = function(event){
+        var data = JSON.parse(event.data)
+        var msg = data.msg;
+        var nick = data.sendUserNickname;
+        switch(data.type){
+            case 'init':
+                console.log("init");
+                break;
+            case 'msg':
+                console.log("msg");
+                setMessageInnerHTML(nick+":  "+msg);
+                break;
+            default:
+                break;
+        }
+    }
+    function enter(){
+        var map = new Map();
+        map.set("type","init");
+        map.set("user",getCookie("user"));
+        var message = Map2Json(map);
+        webSocket.send(message);
+    }
+
+    function send() {
+        var msg = document.getElementById('text').value;
+        console.log("1:"+msg);
+        if (msg != null && msg !== ""){
+            var map = new Map();
+            map.set("type","msg");
+            map.set("user",getCookie("user"));
+            map.set("msg",msg);
+            var map2json=Map2Json(map);
+            if (map2json.length < 8000){
+                console.log("4:"+map2json);
+                webSocket.send(map2json);
+            }else {
+                console.log("文本太长了，少写一点吧😭");
+            }
+        }
+    }
+
+    function getCookie(cookie_name) {
+        var allcookies = document.cookie;
+        //索引长度，开始索引的位置
+        var cookie_pos = allcookies.indexOf(cookie_name);
+
+        // 如果找到了索引，就代表cookie存在,否则不存在
+        if (cookie_pos != -1) {
+            // 把cookie_pos放在值的开始，只要给值加1即可
+            //计算取cookie值得开始索引，加的1为“=”
+            cookie_pos = cookie_pos + cookie_name.length + 1;
+            //计算取cookie值得结束索引
+            var cookie_end = allcookies.indexOf(";", cookie_pos);
+
+            if (cookie_end == -1) {
+                cookie_end = allcookies.length;
+
+            }
+            //得到想要的cookie的值
+            var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+        }
+        return value;
+    }
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML) {
+        $("#message").last().append('<li class="list-group-item">' +innerHTML+'</li>');
+    }
+
+    function Map2Json(map) {
+        var str = "{";
+        map.forEach(function (value, key) {
+            str += '"'+key+'"'+':'+ '"'+value+'",';
+        })
+        str = str.substring(0,str.length-1)
+        str +="}";
+        return str;
+    }
+
+</script>
+<!--!&#45;&#45; jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"/>
+</body>
+</html>
