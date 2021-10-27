@@ -54,7 +54,7 @@ public class UserController {
         }
         // 随便造一个session，放入
         //request.getSession().setAttribute("userid", idname);
-        String userUUID = UUID.randomUUID().toString().replaceAll("-","");
+        String userUUID = idname;//UUID.randomUUID().toString().replaceAll("-","");
         UserSession.put(userUUID,user);
         Cookie cookie = new Cookie("user",userUUID);
         cookie.setMaxAge(24*60*60); //一天过期

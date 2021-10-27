@@ -11,3 +11,15 @@ CREATE TABLE user
     UNIQUE INDEX id_name(id_name),
     INDEX nick_name(nick_name)
 );
+
+# 建立全局聊天数据库
+CREATE TABLE global_room_msg
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    id_name VARCHAR(128) NOT NULL ,
+    nick_name VARCHAR(128) not null ,
+    msg VARCHAR(10240) not null,
+    msg_time DATETIME not null ,
+    PRIMARY KEY (id),
+    INDEX id_name(id_name)
+);

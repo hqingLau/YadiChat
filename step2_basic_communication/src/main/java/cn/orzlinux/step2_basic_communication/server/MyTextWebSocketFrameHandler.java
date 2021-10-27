@@ -1,6 +1,9 @@
 package cn.orzlinux.step2_basic_communication.server;
 
+import cn.orzlinux.step2_basic_communication.Utils.SpringUtil;
+import cn.orzlinux.step2_basic_communication.bean.TextMsg;
 import cn.orzlinux.step2_basic_communication.bean.User;
+import cn.orzlinux.step2_basic_communication.service.TextMsgService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.org.apache.bcel.internal.generic.NEW;
@@ -16,12 +19,23 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.EventExecutorGroup;
 import org.apache.catalina.manager.util.SessionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@ChannelHandler.Sharable
 public class MyTextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
+    private static TextMsgService textMsgService;
+
+    static {
+        textMsgService = SpringUtil.getBean(TextMsgService.class);
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         SocketSession session = SocketSession.getSession(ctx);
@@ -36,18 +50,22 @@ public class MyTextWebSocketFrameHandler extends SimpleChannelInboundHandler<Tex
                 user = session.getUser();
                 result.put("type","msg");
                 result.put("msg",map.get("msg"));
-                result.put("sendUserId",user.getIdName());
+                result.put("sendUserCookieId",session.getUserCookieId());
                 result.put("sendUserNickname",user.getNickName());
+                TextMsg textMsg = new TextMsg(user.getIdName(),user.getNickName(),map.get("msg"),new Date());
+                textMsgService.insertMsg(textMsg);
                 SessionGroup.getInstance().sendToOthers(result,session);
                 break;
             case "init":
                 //String room = map.getOrDefault("room",null);
                 String room = "群聊";
                 session.setGroup(room);
-                user = UserSession.get(map.getOrDefault("user",null));
+                String userCookieId = map.getOrDefault("user",null);
+                user = UserSession.get(userCookieId);
                 if(user==null) {
                     return;
                 }
+                session.setUserCookieId(userCookieId);
                 session.setUser(user);
                 SessionGroup.getInstance().addSession(session);
                 break;

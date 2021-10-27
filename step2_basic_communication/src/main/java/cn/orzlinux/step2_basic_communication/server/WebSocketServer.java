@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
 public class WebSocketServer {
     private static WebSocketServer server;
 
-    private static final int READ_IDLE_TIME_OUT = 300;
-    private static final int WRITE_IDLE_TIME_OUT = 60;
-    private static final int ALL_IDLE_TIME_OUT = 60;
+    private static final int READ_IDLE_TIME_OUT = 0;
+    private static final int WRITE_IDLE_TIME_OUT = 0;
+    private static final int ALL_IDLE_TIME_OUT = 0;
 
     private WebSocketServer() {}
 

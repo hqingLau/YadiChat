@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.orzlinux.step2_basic_communication.dao.TextMsgDao">
+ <insert id="insert" parameterType="TextMsg" >
+        insert into global_room_msg(id_name,nick_name,msg,msg_time) values(#{idname},#{nick_name},#{msg},#{msgTime})
+    </insert>
+
+    <select id="getLast100Msg" resultType="TextMsg">
+        select
+               id_name idname,
+               nick_name nick_name,
+               msg msg,
+               msg_time msgTime
+        from global_room_msg
+        order by id DESC
+        limit 100
+    </select>
+</mapper>

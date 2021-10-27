@@ -23,5 +23,7 @@ public class UserInterceptor implements HandlerInterceptor  {
         }
         response.sendRedirect("/signin");
         return false;
+
+        //return true;
     }
 }

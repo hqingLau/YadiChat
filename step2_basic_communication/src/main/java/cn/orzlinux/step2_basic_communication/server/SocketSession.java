@@ -18,6 +18,16 @@ public class SocketSession {
     private User user;
     // session唯一标识
     private final String sessionId;
+
+    public String getUserCookieId() {
+        return userCookieId;
+    }
+
+    public void setUserCookieId(String userCookieId) {
+        this.userCookieId = userCookieId;
+    }
+
+    private String userCookieId;
     private String group;
     // session中存储的属性值
     private Map<String,Object> map = new HashMap<>();
