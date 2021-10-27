@@ -58,6 +58,8 @@ public class UserController {
         UserSession.put(userUUID,user);
         Cookie cookie = new Cookie("user",userUUID);
         cookie.setMaxAge(24*60*60); //一天过期
+        // 配置cookie为主站cookie
+        cookie.setDomain("orzlinux.cn");
         response.addCookie(cookie);
         return "redirect:/home";
     }

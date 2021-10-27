@@ -22,7 +22,7 @@ public class WebSocketServer {
 
     private static final int READ_IDLE_TIME_OUT = 0;
     private static final int WRITE_IDLE_TIME_OUT = 0;
-    private static final int ALL_IDLE_TIME_OUT = 0;
+    private static final int ALL_IDLE_TIME_OUT = 5;
 
     private WebSocketServer() {}
 

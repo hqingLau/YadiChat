@@ -80,10 +80,10 @@ public class MyTextWebSocketFrameHandler extends SimpleChannelInboundHandler<Tex
         if(evt== WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
             new SocketSession(ctx.channel());
         } else if (evt instanceof IdleStateEvent) {
-            IdleStateEvent stateEvent = (IdleStateEvent) evt;
-            if(stateEvent.state()== IdleState.READER_IDLE) {
-                ctx.channel().close();
-            }
+            //IdleStateEvent stateEvent = (IdleStateEvent) evt;
+            //if(stateEvent.state()== IdleState.READER_IDLE) {
+            //    ctx.channel().close();
+            //}
         } else {
             super.userEventTriggered(ctx,evt);
         }
@@ -92,5 +92,11 @@ public class MyTextWebSocketFrameHandler extends SimpleChannelInboundHandler<Tex
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.close();
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        //System.out.println("客户端断开连接："+ctx.channel().localAddress().toString());
+        super.channelInactive(ctx);
     }
 }
