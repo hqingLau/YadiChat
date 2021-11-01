@@ -1,0 +1,290 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>全局聊天室</title>
+    <!-- 引入 Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <style type="text/css">
+        body{ padding-bottom:80px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .fixed{
+            max-width: 800px;
+            margin: 0 auto;
+            position: fixed;
+            bottom: 0px;
+            width: 100%;
+            height: 50px;
+            /*background-color: #000;*/
+            background-color: white;
+            z-index: 9999;
+        }
+        .msg {
+            margin-left: 30px;
+            margin-right: 30px;
+            margin-top: 8px;
+            max-width: 500px;
+        }
+        .nickname {
+            background: #31708f;
+            color: white;
+            border-radius: 10px;
+            padding: 8px;
+        }
+        ul {
+            overflow: auto;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        li {
+            float: left;
+            width: 800px;
+            margin: 0 auto;
+        }
+
+        .haha {
+            background: #00bfff1c;
+            border-radius: 5px;
+            padding: 10px;
+            width: fit-content;
+            margin-top: 5px;
+        }
+
+        span {
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+<div class="page-header text-center text-primary">
+    <h1>聊天室</h1>
+</div>
+
+<br /><br />
+<!--<div id="message"></div>-->
+<ul class="list-group" id="message">
+    <li class="list-group-item"><span class="nickname">系统信息</span><div class="msg"> 欢迎入群</div></li>
+
+    <!--<li class="list-group-item">-->
+    <!--    <div style="float: right">-->
+    <!--        <span class="nickname">dsafffffffffffffffffffffffffff</span>-->
+    <!--    </div>-->
+    <!--    <br />-->
+    <!--    <div class="msg" style="float: right"> 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群-->
+    <!--            欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群-->
+    <!--            欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群-->
+    <!--            欢迎入群 欢迎入群 欢迎入群 欢迎入群-->
+    <!--            欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群-->
+    <!--            欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群欢迎入群 欢迎入群-->
+    <!--            欢迎入群 欢迎入群 欢迎入群 欢迎入群 欢迎入群-->
+    <!--    </div>-->
+
+    <!--</li>-->
+
+</ul>
+<div class="clear:both"></div>
+<br /><br />
+
+
+<div class="fixed">
+    <button class="btn btn-primary" style="float: right;margin-right: 10px" type="button" onclick="send()">发送</button>
+    <div style="overflow: hidden; padding-right: 10px">
+    <textarea style="margin-left:10px;width: 100%; resize: none"
+           id="text"
+           name="send"
+           placeholder="输入发送消息"
+           rows="1"
+           maxlength="1000"
+           minlength="1"
+           class="form-control"></textarea>
+    </div>
+    <div class="clear"></div>
+</div>
+
+<script type="text/javascript">
+    var webSocket;
+    var loadPreMsg = false;
+    var wsConnect = false; //避免重复连接
+    var url = "ws://ws-yadichat.orzlinux.cn/ws";
+    // var url = "ws://localhost:10240/ws";
+    if (window.WebSocket) {
+        webSocket = new WebSocket(url);
+    } else {
+        alert("抱歉，您的浏览器不支持WebSocket协议!");
+    }
+
+    function setWebSocket() {
+        //连通之后的回调事件
+        webSocket.onopen = function() {
+            console.log("已经连通了websocket");
+            wsConnect = true;
+            enter();
+        }
+        //连接发生错误的回调方法
+        webSocket.onerror = function(event){
+            console.log("出错了");
+            wsConnect = false;
+            reconnect(url);
+//              setMessageInnerHTML("连接失败");
+        };
+
+        //连接关闭的回调方法
+        webSocket.onclose = function(){
+            console.log("连接已关闭...");
+            wsConnect = false;
+            reconnect(url);
+        }
+
+        //接收到消息的回调方法
+        webSocket.onmessage = function(event){
+            var data = JSON.parse(event.data)
+            var msg = data.msg;
+            var nick = data.sendUserNickname;
+            var userId = data.sendUserCookieId;
+            switch(data.type){
+                case 'init':
+                    console.log("init");
+                    break;
+                case 'msg':
+                    console.log("msg");
+                    setMessageInnerHTML(nick, msg,userId);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    setWebSocket();
+    function reconnect(url) {
+        if(wsConnect) return;
+        //没连接上会一直重连，设置延迟避免请求过多
+        webSocket = new WebSocket(url);
+        wsConnect = true;
+        setWebSocket();
+        console.log("正在重连，当前时间" + new Date());
+    }
+
+
+    function enter(){
+        var map = new Map();
+        map.set("type","init");
+        map.set("user",getCookie("user"));
+        var message = Map2Json(map);
+        webSocket.send(message);
+    //    获取最近100条消息
+        if(!loadPreMsg) {
+            loadPreMsg = true;
+
+            $.ajax({
+                url: '/textMsg/getLast100Msg',
+                success: function (json) {
+                    $.each(json, function (i, item) {
+                        //循环获取数据
+                        var nick = item.nick_name;
+                        var msg = item.msg;
+                        var userId = item.idname;
+
+                        if (userId != getCookie("user")) {
+                            // 别人
+                            $("#message").last().append('<li class="list-group-item"><span class="nickname">' + nick +
+                                '</span><div class="msg"><div class="haha"><span>' + msg + '</span></div></div></li>');
+                        } else {
+                            // 自己
+                            $("#message").last().append('<li class="list-group-item">\n' +
+                                '        <div style="float: right">\n' +
+                                '            <span class="nickname" style="background: forestgreen;">' + nick + '</span>\n' +
+                                '        </div>\n' +
+                                '        <br />\n' +
+                                '        <div class="msg" style="float: right"><div class="haha"><span> ' + msg + '</span></div></div></li>');
+                        }
+
+                    });
+                    window.scrollTo(0, 99999999);
+
+                }
+            });
+        }
+    }
+
+    function send() {
+        var msg = document.getElementById('text').value;
+        console.log("1:"+msg);
+        if (msg != null && msg !== ""){
+            var map = new Map();
+            map.set("type","msg");
+            map.set("user",getCookie("user"));
+            map.set("msg",msg);
+            var map2json=Map2Json(map);
+            if (map2json.length < 8000){
+                console.log("4:"+map2json);
+                webSocket.send(map2json);
+                document.getElementById('text').value='';
+            }else {
+                console.log("文本太长了，少写一点吧😭");
+            }
+        }
+    }
+
+    function getCookie(cookie_name) {
+        var allcookies = document.cookie;
+        //索引长度，开始索引的位置
+        var cookie_pos = allcookies.indexOf(cookie_name);
+
+        // 如果找到了索引，就代表cookie存在,否则不存在
+        if (cookie_pos != -1) {
+            // 把cookie_pos放在值的开始，只要给值加1即可
+            //计算取cookie值得开始索引，加的1为“=”
+            cookie_pos = cookie_pos + cookie_name.length + 1;
+            //计算取cookie值得结束索引
+            var cookie_end = allcookies.indexOf(";", cookie_pos);
+
+            if (cookie_end == -1) {
+                cookie_end = allcookies.length;
+
+            }
+            //得到想要的cookie的值
+            var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+        }
+        return value;
+    }
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(nick,msg,userId) {
+        if(userId!=getCookie("user")){
+            // 别人
+            $("#message").last().append('<li class="list-group-item"><span class="nickname">' +nick+
+                '</span><div class="msg"><div class="haha"><span>'+msg+ '</span></div></div></li>');
+        }else {
+            // 自己
+            $("#message").last().append('<li class="list-group-item">\n' +
+                '        <div style="float: right">\n' +
+                '            <span class="nickname" style="background: forestgreen;">' + nick +'</span>\n' +
+                '        </div>\n' +
+                '        <br />\n' +
+                '        <div class="msg" style="float: right"><div class="haha"><span> '+msg+ '</span></div></div></li>');
+        }
+        window.scrollTo(0,99999999);
+
+
+    }
+
+    function Map2Json(map) {
+        var str = "{";
+        map.forEach(function (value, key) {
+            str += '"'+key+'"'+':'+ '"'+value+'",';
+        })
+        str = str.substring(0,str.length-1)
+        str +="}";
+        return str;
+    }
+</script>
+<!--!&#45;&#45; jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"/>
+</body>
+</html>

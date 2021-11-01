@@ -1,9 +1,8 @@
-package cn.orzlinux.step2_basic_communication.controller;
+package cn.orzlinux.step3_group.controller;
 
-import cn.orzlinux.step2_basic_communication.bean.User;
-import cn.orzlinux.step2_basic_communication.server.UserSession;
-import cn.orzlinux.step2_basic_communication.service.UserService;
-import cn.orzlinux.step2_basic_communication.tools.MD5;
+import cn.orzlinux.step3_group.bean.User;
+import cn.orzlinux.step3_group.server.UserSession;
+import cn.orzlinux.step3_group.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,12 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
 
 @Controller
 public class UserController {
@@ -59,7 +56,7 @@ public class UserController {
         Cookie cookie = new Cookie("user",userUUID);
         cookie.setMaxAge(24*60*60); //一天过期
         // 配置cookie为主站cookie
-        cookie.setDomain("orzlinux.cn");
+        //cookie.setDomain("orzlinux.cn");
         response.addCookie(cookie);
         return "redirect:/home";
     }
@@ -86,7 +83,7 @@ public class UserController {
             Cookie cookie = new Cookie("user",userUUID);
             cookie.setMaxAge(24*60*60); //一天过期
             // 配置cookie为主站cookie
-            cookie.setDomain("orzlinux.cn");
+            //cookie.setDomain("orzlinux.cn");
             response.addCookie(cookie);
             return "redirect:/";
         } catch (Exception e) {

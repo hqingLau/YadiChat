@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.orzlinux.step3_group.dao.GroupOrFriendDao">
+    <!--int userAddGroupOrFriend(String idname,GroupOrFriend groupOrFriend);-->
+    <!--int userDeleteGroupOrFriend(String idname,GroupOrFriend groupOrFriend);-->
+    <!--List<GroupOrFriend> getGroupOrFriend(String idname);-->
+    <!--int addNewGroupInfo2Master(String idname,String groupName); // idname作为房主创建群（新建信息表、idname插入表名）-->
+    <!--int deleteGroupInfoFromMaster(String groupName); // 删除群，应在service验证权限-->
+    <!--String getGroupMaster(String groupName);-->
+    <!--int joinGroup(String idname,String groupName);-->
+
+    <!--int insertMsg(String groupName, TextMsg textMsg);-->
+    <!--int getLast100Msg(String groupName);-->
+    <insert id="userAddGroupOrFriend">
+        insert into ${idname}(type,group_friend_name) values(#{groupOrFriend.type},#{groupOrFriend.groupFriendName})
+    </insert>
+
+    <insert id="userDeleteGroupOrFriend">
+        delete from ${idname} where type = #{groupOrFriend.type} and group_friend_name = #{groupOrFriend.groupFriendName}
+    </insert>
+
+    <select id="getGroupOrFriend" resultType="GOFWithNick">
+        select a.type type,
+               a.group_friend_name groupFriendName,
+            b.group_nickname nickname
+        from ${idname} a LEFT JOIN groupmaster b on a.group_friend_name = b.group_idname
+    </select>
+
+    <insert id="addNewGroupInfo2Master">
+        insert into groupmaster(id_name,group_idname,group_nickname) values (#{idname},#{groupName},#{groupNick})
+    </insert>
+
+    <insert id="deleteGroupInfoFromMaster">
+        delete from  groupmaster where id_name = #{idname} and group_idname = #{groupName}
+    </insert>
+
+    <select id="getGroupMaster" resultType="String">
+        select id_name from groupmaster where group_idname = #{groupName}
+    </select>
+
+    <insert id="joinGroup">
+        insert into ${idname}(type,group_friend_name) values(0,#{groupName})
+    </insert>
+
+    <insert id="insertMsg">
+        insert into ${groupName}(id_name,nick_name,msg,msg_time) values(#{textMsg.idname},#{textMsg.nick_name},#{textMsg.msg}
+            ,#{textMsg.msgTime})
+    </insert>
+
+    <select id="getLast100Msg" resultType="TextMsg">
+        select
+            id_name idname,
+            nick_name nick_name,
+            msg msg,
+            msg_time msgTime
+        from ${groupName}
+        order by id DESC
+        limit 100
+    </select>
+
+    <!--int createGroupTable(String groupName);-->
+    <!--int dropGroupTable(String groupName);-->
+    <update id="createGroupTable" parameterType="java.lang.String">
+        create table if not exists ${groupName} (
+            id INT NOT NULL AUTO_INCREMENT,
+            id_name VARCHAR(128) NOT NULL ,
+            nick_name VARCHAR(128) not null ,
+            msg VARCHAR(10240) not null,
+            msg_time DATETIME not null ,
+            PRIMARY KEY (id),
+            INDEX id_name(id_name)
+        )
+    </update>
+
+    <update id="dropGroupTable" parameterType="java.lang.String">
+        drop table if exists ${groupName}
+    </update>
+</mapper>

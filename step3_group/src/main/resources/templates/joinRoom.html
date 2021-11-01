@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <!--<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>-->
+    <script type="text/javascript">
+        window.onload = function () {
+            document.getElementById("uid").value=getCookie("user");
+        }
+        function f1(){
+            //5-20个字母
+            var regx = /^[aA-zZ0-9_.]{5,20}$/;
+            var username = document.getElementById("idname").value;
+            if(regx.test(username)){
+                document.getElementById("d1").style.color = "green";
+                document.getElementById("d1").innerHTML="√";
+                return true;
+            }else{
+                document.getElementById("d1").style.color = "red";
+                document.getElementById("d1").innerHTML="×";
+                return false;
+            }
+        }
+        function f2(){
+            //5-20个字母
+            var regx = /^[aA-zZ0-9_.]{5,20}$/;
+            var password = document.getElementById("password").value;
+            if(regx.test(password)){
+                document.getElementById("d2").style.color = "green";
+                document.getElementById("d2").innerHTML="√";
+                return true;
+            }else{
+                document.getElementById("d2").style.color = "red";
+                document.getElementById("d2").innerHTML="×";
+                return false;
+            }
+        }
+
+        function f3(){
+            //5-20个字母
+            var password = document.getElementById("gid").value;
+            if(password.length>=1&&password.length<50){
+                document.getElementById("d3").style.color = "green";
+                document.getElementById("d3").innerHTML="√";
+                return true;
+            }else{
+                document.getElementById("d3").style.color = "red";
+                document.getElementById("d3").innerHTML="×";
+                return false;
+            }
+        }
+
+        function subForm(){
+            if(f3()){
+                return true;
+            }
+            return false;
+        }
+    </script>
+    <style type="text/css">
+        body {
+            background-color: grey;
+            background-size: 100%;
+            background-repeat: no-repeat;
+        }
+
+        #login_frame {
+            width: 400px;
+            height: 200px;
+            padding: 13px;
+
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -200px;
+            margin-top: -200px;
+
+            background-color: rgba(240, 255, 255, 0.5);
+
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        form p > * {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        #image_logo {
+            margin-top: 22px;
+        }
+
+        .label_input {
+            margin-right: -4px;
+            font-size: 14px;
+            font-family: 宋体;
+
+            width: 65px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+
+            color: white;
+            background-color: #3CD8FF;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .text_field {
+            width: 278px;
+            height: 28px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border: 0;
+        }
+
+        #btn_login {
+            font-size: 14px;
+            font-family: 宋体;
+
+            width: 120px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+
+            color: white;
+            background-color: #3BD9FF;
+            border-radius: 6px;
+            border: 0;
+
+            float: left;
+        }
+        .btn_login {
+            font-size: 14px;
+            font-family: 宋体;
+
+            width: 120px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+
+            color: white;
+            background-color: #3BD9FF;
+            border-radius: 6px;
+            border: 0;
+
+            float: left;
+        }
+
+        #regist_a {
+            font-size: 12px;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            float: right;
+            top: 5px;
+
+        }
+
+        #regist_a:hover {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        #login_control {
+            padding: 0 28px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="login_frame">
+
+    <h2>加入房间</h2>
+    <form action="/join_room" method="Post" onsubmit="return subForm()">
+
+        <p><label class="label_input">房间id</label>
+        <input id="gid" type="text" name="gid" placeholder="房间id号，在标题下面" onblur="f3()"  class="text_field"><span id="d3"></span>
+        </p>
+        <input id="uid" name="uid" type="hidden">
+        <div id="login_control">
+            <input type="submit" class="btn_login" id="s1" value="加入"/>
+            <a id="regist_a" href="/">主页</a>
+        </div>
+    </form>
+</div>
+<script>
+    function getCookie(cookie_name) {
+        var allcookies = document.cookie;
+        //索引长度，开始索引的位置
+        var cookie_pos = allcookies.indexOf(cookie_name);
+
+        // 如果找到了索引，就代表cookie存在,否则不存在
+        if (cookie_pos != -1) {
+            // 把cookie_pos放在值的开始，只要给值加1即可
+            //计算取cookie值得开始索引，加的1为“=”
+            cookie_pos = cookie_pos + cookie_name.length + 1;
+            //计算取cookie值得结束索引
+            var cookie_end = allcookies.indexOf(";", cookie_pos);
+
+            if (cookie_end == -1) {
+                cookie_end = allcookies.length;
+
+            }
+            //得到想要的cookie的值
+            var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+        }
+        return value;
+    }
+</script>
+</body>
+
+</html>

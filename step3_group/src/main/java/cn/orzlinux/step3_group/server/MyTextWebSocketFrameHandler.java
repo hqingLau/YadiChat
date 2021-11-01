@@ -1,39 +1,29 @@
-package cn.orzlinux.step2_basic_communication.server;
+package cn.orzlinux.step3_group.server;
 
-import cn.orzlinux.step2_basic_communication.Utils.SpringUtil;
-import cn.orzlinux.step2_basic_communication.bean.TextMsg;
-import cn.orzlinux.step2_basic_communication.bean.User;
-import cn.orzlinux.step2_basic_communication.service.TextMsgService;
+import cn.orzlinux.step3_group.Utils.SpringUtil;
+import cn.orzlinux.step3_group.bean.TextMsg;
+import cn.orzlinux.step3_group.bean.User;
+import cn.orzlinux.step3_group.service.GroupOrFriendService;
+import cn.orzlinux.step3_group.service.TextMsgService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
-import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakeException;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
-import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.concurrent.EventExecutorGroup;
-import org.apache.catalina.manager.util.SessionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @ChannelHandler.Sharable
 public class MyTextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
-    private static TextMsgService textMsgService;
+    private static GroupOrFriendService service;
 
     static {
-        textMsgService = SpringUtil.getBean(TextMsgService.class);
+        service = SpringUtil.getBean(GroupOrFriendService.class);
     }
 
     @Override
@@ -53,12 +43,12 @@ public class MyTextWebSocketFrameHandler extends SimpleChannelInboundHandler<Tex
                 result.put("sendUserCookieId",session.getUserCookieId());
                 result.put("sendUserNickname",user.getNickName());
                 TextMsg textMsg = new TextMsg(user.getIdName(),user.getNickName(),map.get("msg"),new Date());
-                textMsgService.insertMsg(textMsg);
+                //textMsgService.insertMsg(textMsg);
+                service.insertMsg(session.getGroup(),textMsg);
                 SessionGroup.getInstance().sendToOthers(result,session);
                 break;
             case "init":
-                //String room = map.getOrDefault("room",null);
-                String room = "群聊";
+                String room = map.getOrDefault("group",null);
                 session.setGroup(room);
                 String userCookieId = map.getOrDefault("user",null);
                 user = UserSession.get(userCookieId);

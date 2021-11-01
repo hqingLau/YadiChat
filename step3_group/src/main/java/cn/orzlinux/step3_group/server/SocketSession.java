@@ -1,13 +1,12 @@
-package cn.orzlinux.step2_basic_communication.server;
+package cn.orzlinux.step3_group.server;
 
-import cn.orzlinux.step2_basic_communication.bean.User;
+import cn.orzlinux.step3_group.bean.User;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 对应用户服务端会话管理

@@ -11,5 +11,4 @@ public class Step2SignupInApplication {
         SpringApplication.run(Step2SignupInApplication.class, args);
         WebSocketServer.getInstance().run(10240);
     }
-
 }
