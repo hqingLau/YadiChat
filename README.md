@@ -12,4 +12,4 @@
 
 [1. 登陆注册](https://orzlinux.cn/blog/yadichat1.html)
 
-2. 全局聊天室
+[2. 全局聊天室](https://orzlinux.cn/blog/yadichat2.html)
