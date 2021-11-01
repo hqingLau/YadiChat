@@ -59,11 +59,12 @@ delimiter ;
 call create_table_from_current_users();
 
 # 群组信息，群的主人，对群有删除权限
-create table groupMaster(
+create table groupmaster(
     id INT NOT NULL AUTO_INCREMENT,
-    id_name VARCHAR(128) NOT NULL , # 存放所属用户名
-    group_name VARCHAR(128) not null ,
+    id_name VARCHAR(128) NOT NULL ,
+    group_idname VARCHAR(128) not null ,
+    group_nickname VARCHAR(128) not null,
     PRIMARY KEY (id),
     INDEX id_name(id_name),
-    INDEX group_name(group_name)
+    INDEX group_idname(group_idname)
 )

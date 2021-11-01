@@ -199,6 +199,7 @@
         var map = new Map();
         map.set("type","init");
         map.set("user",getCookie("user"));
+        map.set("group",globalGroup);
         var message = Map2Json(map);
         webSocket.send(message);
     //    获取最近100条消息
