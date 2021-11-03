@@ -1,8 +1,8 @@
-package cn.orzlinux.step3_group.controller;
+package cn.orzlinux.step4_file_img.controller;
 
-import cn.orzlinux.step3_group.bean.User;
-import cn.orzlinux.step3_group.server.UserSession;
-import cn.orzlinux.step3_group.service.UserService;
+import cn.orzlinux.step4_file_img.bean.User;
+import cn.orzlinux.step4_file_img.server.UserSession;
+import cn.orzlinux.step4_file_img.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

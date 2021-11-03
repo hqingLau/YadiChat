@@ -10,10 +10,12 @@
         <module name="YadiChat" />
         <module name="step1_signup_in" />
         <module name="step3_group" />
+        <module name="step4_file_img" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="step2_basic_communication (1)" target="1.8" />
+      <module name="step3_group (1)" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -22,6 +24,7 @@
       <module name="step2_basic_communication" options="-parameters" />
       <module name="step2_basic_communication (1)" options="-parameters" />
       <module name="step3_group" options="-parameters" />
+      <module name="step4_file_img" options="-parameters" />
     </option>
   </component>
 </project>

@@ -5,6 +5,7 @@
     <title>全局聊天室</title>
     <!-- 引入 Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css">
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
     <style type="text/css">
         body{ padding-bottom:80px;
@@ -42,7 +43,7 @@
 
         li {
             float: left;
-            width: 800px;
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -71,6 +72,11 @@
         span {
             word-break: break-all;
         }
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -82,16 +88,16 @@
 <br /><br />
 <!--<div id="message"></div>-->
 <div style="float:left">
-    <ul class="list-group" id="belong_group" style="overflow-y: scroll; width: 170px; height: 60vh">
+    <ul class="list-group" id="belong_group" style="overflow-y: scroll; width: 170px; height: 74vh ;background: lightgray">
         <li  class="list-group-item"><button class="btn btn-inverse"><a href="/new-room">新建房间</a> </button></li>
         <li  class="list-group-item"><button class="btn btn-inverse"><a href="/join-room">加入房间</a> </button></li>
-        <li  class="list-group-item"><button class="btn btn-inverse" onclick="reenter(this.id)"  id="global_room_msg">全局房间</button> </li>
+        <li  class="list-group-item"><button class="group-btn btn btn-inverse" onclick="reenter(this.id)"  id="global_room_msg">全局房间</button> </li>
     </ul>
 </div>
 
 <div style="height: 61vh;background: whitesmoke">
 <ul class="list-group" id="message" style="overflow-y: scroll; max-height: 60vh">
-    <li class="list-group-item"><span class="nickname">系统信息</span><div class="msg"> 欢迎入群</div></li>
+    <li class="list-group-item"><span class="nickname">系统信息</span><div class="msg"> <img style="max-width: 350px; max-height: 250px"  src="../static/Inked1f458c3644db4f1db12c16772edce24c无标题_LI.jpg"></div></li>
     <!--<li class="list-group-item">-->
     <!--    <div style="float: right">-->
     <!--        <span class="nickname">dsafffffffffffffffffffffffffff</span>-->
@@ -111,26 +117,83 @@
 </ul>
 </div>
 <div class="clear:both"></div>
-<br /><br />
 
+<div class="">
+    <button class="btn btn-primary" style="float: right;margin-right: 10px;margin-top: 33px" type="button" onclick="send()">发送</button>
 
-<div class="fixed">
-    <button class="btn btn-primary" style="float: right;margin-right: 10px" type="button" onclick="send()">发送</button>
     <div style="overflow: hidden; padding-right: 10px">
-    <textarea style="margin-left:10px;width: 100%; resize: none"
+        <div style="padding-left:10px; float: left;"><input type="file" id="d3" onchange="fileChange(this);"></div>
+        <button class="btn btn-mini" style="float: right;" id="d4">文件上传</button>
+    <textarea style="margin-left:10px;width: 100%; resize: none;height: 10vh"
            id="text"
            name="send"
            placeholder="输入发送消息"
-           rows="1"
            maxlength="1000"
            minlength="1"
            class="form-control"></textarea>
     </div>
+
     <div class="clear"></div>
 </div>
 
+<script>
+    function fileChange(target) {
+        var fileSize = 0;
+        fileSize = target.files[0].size;
+        var size = fileSize / 1024;
+        if(size>10000){
+            alert("你好，我服务器太菜，文件最好不要大于10M");
+            target.value="";
+            return false;   //阻止submit提交
+        }
+    }
+    //点击按钮朝后端发送普通键值对和文件数据
+    $('#d4').on('click',function (){
+        //1.需要先利用FormData内置对象
+        let formDataObj = new FormData();
+
+        //3.添加文件对象
+        formDataObj.append('file',$('#d3')[0].files[0])
+        //4.将对象基于ajax发送给后端
+        $.ajax({
+            url:'/yadiUploadFile',
+            type:'post',
+            data:formDataObj,  //直接将对象放在data后面
+
+            //ajax发送文件必须要指定两个参数
+            contentType:false,  //不要使用任何编码，django后端能够自动识别formdata对象
+            processData:false,  //告诉浏览器不要对你的数据进行任何处理
+
+            success:function (data) {
+                //转换json字符串为json对象
+                //方式一：
+                console.log(data);
+                var obj2 = data;
+                var obj = document.getElementById('d3') ;
+                obj.outerHTML=obj.outerHTML;
+                //转为json对象可以直接点属性
+
+
+                var map = new Map();
+                if(obj2.status=="false") {
+                    return;
+                }
+                map.set("type",obj2.type);
+                map.set("user",getCookie("user"));
+                map.set("group",globalGroup);
+                map.set("msg",obj2.origin_name);
+                map.set("url",obj2.file_url);
+                var map2json=Map2Json(map);
+                webSocket.send(map2json);
+            }
+        })
+
+    })
+</script>
 <script type="text/javascript">
     var webSocket;
+    var MAGIC_FILE_SPLIT="rrutg@%&$^%@$nv.,xgjqer";
+    var MAGIC_IMAGE_SPLIT="%@^$%&afdgw%^@$^@asqdf";
     var globalGroup='global_room_msg';
     var loadPreMsg = false;
     var wsConnect = false; //避免重复连接
@@ -141,7 +204,16 @@
     } else {
         alert("抱歉，您的浏览器不支持WebSocket协议!");
     }
+    $(function(){
 
+        function ping() {
+            if(wsConnect===true) {
+                console.log("ping...");
+                webSocket.send("heartbeat");
+            }
+        }
+        setInterval(ping, 5000);
+    })
     function setWebSocket() {
         //连通之后的回调事件
         webSocket.onopen = function() {
@@ -166,6 +238,11 @@
 
         //接收到消息的回调方法
         webSocket.onmessage = function(event){
+            if(event.data==="heartbeat") {
+                console.log("heartbeat");
+                webSocket.send("heartbeat");
+                return;
+            }
             var data = JSON.parse(event.data)
             var msg = data.msg;
             var nick = data.sendUserNickname;
@@ -176,7 +253,15 @@
                     break;
                 case 'msg':
                     console.log("msg");
-                    setMessageInnerHTML(nick, msg,userId);
+                    setMessageInnerHTML(nick, msg,userId,data.type,'');
+                    break;
+                case 'file':
+                    console.log("file");
+                    setMessageInnerHTML(nick, msg,userId,data.type,data.url);
+                    break;
+                case 'image':
+                    console.log("image");
+                    setMessageInnerHTML(nick, msg,userId,data.type,data.url);
                     break;
                 default:
                     break;
@@ -216,7 +301,7 @@
                         var userId = item.groupFriendName;
 
                         $("#belong_group").last().append(' <li class="list-group-item">' +
-                            '<button class="btn btn-inverse" onClick="reenter(this.id)" id='+userId+'>'+nick+'</button> </li>');
+                            '<button class="group-btn btn btn-inverse" onClick="reenter(this.id)" id='+userId+'>'+nick+'</button> </li>');
                     });
                 }
             });
@@ -231,18 +316,45 @@
                         var msg = item.msg;
                         var userId = item.idname;
 
-                        if (userId != getCookie("user")) {
-                            // 别人
-                            $("#message").last().append('<li class="list-group-item"><span class="nickname">' + nick +
-                                '</span><div class="msg"><div class="haha"><span>' + msg + '</span></div></div></li>');
+
+                        var fileurl = "";
+                        console.log(msg);
+                        var msgArray = msg.split(MAGIC_FILE_SPLIT);
+                        console.log("msgArray"+msgArray);
+                        var fileprefix = msgArray[0];
+                        if(msgArray.length==2) {
+                            msg = msgArray[0];
+                            fileurl = msgArray[1];
+                            fileprefix = '<a href="/file?fileurl='+ fileurl+'" style="text-decoration:none; color:cadetblue;cursor:pointer; font-size:16px; padding-top:5px">'+
+                                '📄'+
+                                msg+
+                                '</a>';
                         } else {
+                            msgArray = msg.split(MAGIC_IMAGE_SPLIT);
+                            console.log("msgArray"+msgArray);
+                            fileprefix = msgArray[0];
+                            if(msgArray.length==2) {
+                                msg = msgArray[0];
+                                fileurl = msgArray[1];
+                                fileprefix = '<img style="max-width: 350px; max-height: 250px"  src="/file?fileurl='+ fileurl+'">';
+                            }
+
+                        }
+                        // <img style="max-width: 350px; max-height: 250px"  src="http://localhost:8080/file?fileurl=9bf8d31e39704668a8a5ced9092bae292876F0EA833EDA8DA415ADE79EDE1EA0.jpg">
+
+                        console.log(fileprefix);
+                        if(userId!=getCookie("user")){
+                            // 别人
+                            $("#message").last().append('<li class="list-group-item"><span class="nickname">' +nick+
+                                '</span><div class="msg"><div class="haha"><span>'+fileprefix+ '</span></div></div></li>');
+                        }else {
                             // 自己
                             $("#message").last().append('<li class="list-group-item">\n' +
                                 '        <div style="float: right">\n' +
-                                '            <span class="nickname" style="background: forestgreen;">' + nick + '</span>\n' +
+                                '            <span class="nickname" style="background: forestgreen;">' + nick +'</span>\n' +
                                 '        </div>\n' +
                                 '        <br />\n' +
-                                '        <div class="msg" style="float: right"><div class="haha"><span> ' + msg + '</span></div></div></li>');
+                                '        <div class="msg" style="float: right"><div class="haha"><span> '+fileprefix+ '</span></div></div></li>');
                         }
                     });
                     items = document.querySelectorAll(".msg");
@@ -297,11 +409,20 @@
     }
 
     //将消息显示在网页上
-    function setMessageInnerHTML(nick,msg,userId) {
+    function setMessageInnerHTML(nick,msg,userId,type,url) {
+        var fileprefix = msg;
+        if(type==="file") {
+            fileprefix = '<a href="/file?fileurl='+ url+'" style="text-decoration:none; color:cadetblue;cursor:pointer; font-size:16px; padding-top:5px">'+
+                '📄'+
+            msg+
+            '</a>';
+        } else if(type==="image") {
+            fileprefix = '<img style="max-width: 350px; max-height: 250px"  src="/file?fileurl='+ url+'">';
+        }
         if(userId!=getCookie("user")){
             // 别人
             $("#message").last().append('<li class="list-group-item"><span class="nickname">' +nick+
-                '</span><div class="msg"><div class="haha"><span>'+msg+ '</span></div></div></li>');
+                '</span><div class="msg"><div class="haha"><span>'+fileprefix+ '</span></div></div></li>');
         }else {
             // 自己
             $("#message").last().append('<li class="list-group-item">\n' +
@@ -309,7 +430,7 @@
                 '            <span class="nickname" style="background: forestgreen;">' + nick +'</span>\n' +
                 '        </div>\n' +
                 '        <br />\n' +
-                '        <div class="msg" style="float: right"><div class="haha"><span> '+msg+ '</span></div></div></li>');
+                '        <div class="msg" style="float: right"><div class="haha"><span> '+fileprefix+ '</span></div></div></li>');
         }
         items = document.querySelectorAll(".msg");
         last = items[items.length-1];
@@ -329,6 +450,12 @@
     }
 
     function reenter(groupid) {
+        var x = document.getElementsByClassName("group-btn");
+        var i;
+        for (i = 0; i < x.length; i++) {
+            x[i].style.backgroundColor = "";
+        }
+        document.getElementById(groupid).style.backgroundColor="skyblue";
         var map = new Map();
         map.set("type","init");
         map.set("user",getCookie("user"));
@@ -352,20 +479,46 @@
                         var msg = item.msg;
                         var userId = item.idname;
 
-                        if (userId != getCookie("user")) {
-                            // 别人
-                            $("#message").last().append('<li class="list-group-item"><span class="nickname">' + nick +
-                                '</span><div class="msg"><div class="haha"><span>' + msg + '</span></div></div></li>');
+
+                        var fileurl = "";
+                        console.log(msg);
+                        var msgArray = msg.split(MAGIC_FILE_SPLIT);
+                        console.log("msgArray"+msgArray);
+                        var fileprefix = msgArray[0];
+                        if(msgArray.length===2) {
+                            msg = msgArray[0];
+                            fileurl = msgArray[1];
+                            fileprefix = '<a href="/file?fileurl='+ fileurl+'" style="text-decoration:none; color:cadetblue;cursor:pointer; font-size:16px; padding-top:5px">'+
+                                '📄'+
+                                msg+
+                                '</a>';
                         } else {
+                            msgArray = msg.split(MAGIC_IMAGE_SPLIT);
+                            console.log("msgArray"+msgArray);
+                            fileprefix = msgArray[0];
+                            if(msgArray.length===2) {
+                                msg = msgArray[0];
+                                fileurl = msgArray[1];
+                                fileprefix = '<img style="max-width: 350px; max-height: 250px"  src="/file?fileurl='+ fileurl+'">';
+                            }
+                        }
+
+
+
+                        console.log(fileprefix);
+                        if(userId!=getCookie("user")){
+                            // 别人
+                            $("#message").last().append('<li class="list-group-item"><span class="nickname">' +nick+
+                                '</span><div class="msg"><div class="haha"><span>'+fileprefix+ '</span></div></div></li>');
+                        }else {
                             // 自己
                             $("#message").last().append('<li class="list-group-item">\n' +
                                 '        <div style="float: right">\n' +
-                                '            <span class="nickname" style="background: forestgreen;">' + nick + '</span>\n' +
+                                '            <span class="nickname" style="background: forestgreen;">' + nick +'</span>\n' +
                                 '        </div>\n' +
                                 '        <br />\n' +
-                                '        <div class="msg" style="float: right"><div class="haha"><span> ' + msg + '</span></div></div></li>');
+                                '        <div class="msg" style="float: right"><div class="haha"><span> '+fileprefix+ '</span></div></div></li>');
                         }
-
                     });
                     items = document.querySelectorAll(".msg");
                     last = items[items.length-1];

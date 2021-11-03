@@ -8,7 +8,7 @@
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
     <style type="text/css">
         body{ padding-bottom:80px;
-            max-width: 1000px;
+            max-width: 800px;
             margin: 0 auto;
         }
         .fixed{
@@ -53,21 +53,7 @@
             width: fit-content;
             margin-top: 5px;
         }
-        ::-webkit-scrollbar {
 
-            width: 5px;
-
-            height: 2px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background:linear-gradient(to right, #ccc 0%, #ccc 100%);
-            width: 85%
-
-        }
-
-        ::-webkit-scrollbar-track {
-            background-color: transparent
-        }
         span {
             word-break: break-all;
         }
@@ -76,22 +62,13 @@
 <body>
 <div class="page-header text-center text-primary">
     <h1>聊天室</h1>
-    <div id="cur_room_id">房间id:global_room_msg</div>
 </div>
 
 <br /><br />
 <!--<div id="message"></div>-->
-<div style="float:left">
-    <ul class="list-group" id="belong_group" style="overflow-y: scroll; width: 170px; height: 60vh">
-        <li  class="list-group-item"><button class="btn btn-inverse"><a href="/new-room">新建房间</a> </button></li>
-        <li  class="list-group-item"><button class="btn btn-inverse"><a href="/join-room">加入房间</a> </button></li>
-        <li  class="list-group-item"><button class="btn btn-inverse" onclick="reenter(this.id)"  id="global_room_msg">全局房间</button> </li>
-    </ul>
-</div>
-
-<div style="height: 61vh;background: whitesmoke">
-<ul class="list-group" id="message" style="overflow-y: scroll; max-height: 60vh">
+<ul class="list-group" id="message">
     <li class="list-group-item"><span class="nickname">系统信息</span><div class="msg"> 欢迎入群</div></li>
+
     <!--<li class="list-group-item">-->
     <!--    <div style="float: right">-->
     <!--        <span class="nickname">dsafffffffffffffffffffffffffff</span>-->
@@ -109,7 +86,6 @@
     <!--</li>-->
 
 </ul>
-</div>
 <div class="clear:both"></div>
 <br /><br />
 
@@ -131,7 +107,6 @@
 
 <script type="text/javascript">
     var webSocket;
-    var globalGroup='global_room_msg';
     var loadPreMsg = false;
     var wsConnect = false; //避免重复连接
     var url = "ws://ws-yadichat.orzlinux.cn/ws";
@@ -181,7 +156,6 @@
                 default:
                     break;
             }
-
         }
     }
     setWebSocket();
@@ -199,28 +173,11 @@
         var map = new Map();
         map.set("type","init");
         map.set("user",getCookie("user"));
-        map.set("group",globalGroup);
         var message = Map2Json(map);
         webSocket.send(message);
     //    获取最近100条消息
         if(!loadPreMsg) {
             loadPreMsg = true;
-
-            $.ajax({
-                url: '/group/getbelonggroup?uid='+getCookie("user"),
-                success: function (json) {
-                    $.each(json, function (i, item) {
-                        //循环获取数据
-                        var nick = item.nickname;
-                        var type = item.type;
-                        var userId = item.groupFriendName;
-
-                        $("#belong_group").last().append(' <li class="list-group-item">' +
-                            '<button class="btn btn-inverse" onClick="reenter(this.id)" id='+userId+'>'+nick+'</button> </li>');
-                    });
-                }
-            });
-
 
             $.ajax({
                 url: '/textMsg/getLast100Msg',
@@ -244,10 +201,10 @@
                                 '        <br />\n' +
                                 '        <div class="msg" style="float: right"><div class="haha"><span> ' + msg + '</span></div></div></li>');
                         }
+
                     });
-                    items = document.querySelectorAll(".msg");
-                    last = items[items.length-1];
-                    last.scrollIntoView();
+                    window.scrollTo(0, 99999999);
+
                 }
             });
         }
@@ -260,7 +217,6 @@
             var map = new Map();
             map.set("type","msg");
             map.set("user",getCookie("user"));
-            map.set("group",globalGroup);
             map.set("msg",msg);
             var map2json=Map2Json(map);
             if (map2json.length < 8000){
@@ -311,9 +267,7 @@
                 '        <br />\n' +
                 '        <div class="msg" style="float: right"><div class="haha"><span> '+msg+ '</span></div></div></li>');
         }
-        items = document.querySelectorAll(".msg");
-        last = items[items.length-1];
-        last.scrollIntoView();
+        window.scrollTo(0,99999999);
 
 
     }
@@ -326,53 +280,6 @@
         str = str.substring(0,str.length-1)
         str +="}";
         return str;
-    }
-
-    function reenter(groupid) {
-        var map = new Map();
-        map.set("type","init");
-        map.set("user",getCookie("user"));
-        map.set("group",groupid);
-        var message = Map2Json(map);
-        webSocket.send(message);
-        //    获取最近100条消息
-        loadPreMsg = false;
-        if(!loadPreMsg) {
-            loadPreMsg = true;
-
-            $.ajax({
-                url: '/group/getLast100Msg?gid='+groupid,
-                success: function (json) {
-                    $("#cur_room_id").html("房间号："+groupid);
-                    $("#message").html(' ');
-                    globalGroup = groupid;
-                    $.each(json, function (i, item) {
-                        //循环获取数据
-                        var nick = item.nick_name;
-                        var msg = item.msg;
-                        var userId = item.idname;
-
-                        if (userId != getCookie("user")) {
-                            // 别人
-                            $("#message").last().append('<li class="list-group-item"><span class="nickname">' + nick +
-                                '</span><div class="msg"><div class="haha"><span>' + msg + '</span></div></div></li>');
-                        } else {
-                            // 自己
-                            $("#message").last().append('<li class="list-group-item">\n' +
-                                '        <div style="float: right">\n' +
-                                '            <span class="nickname" style="background: forestgreen;">' + nick + '</span>\n' +
-                                '        </div>\n' +
-                                '        <br />\n' +
-                                '        <div class="msg" style="float: right"><div class="haha"><span> ' + msg + '</span></div></div></li>');
-                        }
-
-                    });
-                    items = document.querySelectorAll(".msg");
-                    last = items[items.length-1];
-                    last.scrollIntoView();
-                }
-            });
-        }
     }
 </script>
 <!--!&#45;&#45; jQuery文件。务必在bootstrap.min.js 之前引入 -->

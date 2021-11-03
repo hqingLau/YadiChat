@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "log4j.logger.com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate",
+      "type": "java.lang.String",
+      "description": "Description for log4j.logger.com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate."
+    },
+    {
+      "name": "log4j.logger.com.ibatis",
+      "type": "java.lang.String",
+      "description": "Description for log4j.logger.com.ibatis."
+    }
+  ] }

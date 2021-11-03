@@ -4,7 +4,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://localhost:3306/YadiChat?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false
     username: root
-    password: Liuhuanqing123.
+    password:
 
   mvc:
     static-path-pattern: /static/**
@@ -14,6 +14,6 @@ spring:
     cache: false
 
 mybatis:
-  type-aliases-package: cn.orzlinux.step3_group.bean
+  type-aliases-package: cn.orzlinux.step4_file_img.bean
   mapper-locations: classpath:mapper/*.xml
 
