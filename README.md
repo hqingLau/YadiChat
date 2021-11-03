@@ -14,6 +14,10 @@
 
 ## 博客讲解
 
-[1. 登陆注册](https://orzlinux.cn/blog/yadichat1.html)
+1. [登陆注册](https://orzlinux.cn/blog/yadichat1.html)
 
-[2. 全局聊天室](https://orzlinux.cn/blog/yadichat2.html)
+2. [全局聊天室](https://orzlinux.cn/blog/yadichat2.html)
+
+3. 自建群聊、加入群聊
+
+4. 图片和文件
